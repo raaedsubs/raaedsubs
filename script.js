@@ -1,68 +1,29 @@
-const rowsPerPage = 30;
-let currentPage = 1;
-let tableData = []; // لتخزين البيانات من Google Sheets
+const sheetId = "1yJFfUHMJCLBpd8yLWtodRCT1r9ucci2kR5O6_lgYX7I";
+const sheetName = "Sheet1"; // اسم الورقة
+const apiKey = "AIzaSyC_DYo3WavStFbToNWxhG21DqAi7_QAm6Q"; // API Key الذي حصلت عليه
 
-const tableBody = document.getElementById("table-body");
-const prevBtn = document.getElementById("prev-btn");
-const nextBtn = document.getElementById("next-btn");
-const pageInfo = document.getElementById("page-info");
-const searchInput = document.getElementById("search");
+// استعلام API
+const url = `https://sheets.googleapis.com/v4/spreadsheets/${sheetId}/values/${sheetName}?key=${apiKey}`;
 
-function renderTable(page = 1, query = "") {
-    const start = (page - 1) * rowsPerPage;
-    const filteredData = tableData.filter(row =>
-        Object.values(row).some(value => value.toString().includes(query))
-    );
-    const paginatedData = filteredData.slice(start, start + rowsPerPage);
-
-    tableBody.innerHTML = paginatedData
-        .map(
-            row => `
-            <tr>
-                <td>${row['الاسم']}</td>
-                <td>${row['النوع']}</td>
-                <td>${row['الحالة']}</td>
-                <td>${row['عدد الحلقات']}</td>
-                <td>${row['الترجمة']}</td>
-            </tr>
-        `
-        )
-        .join("");
-
-    pageInfo.textContent = `صفحة ${page} من ${Math.ceil(filteredData.length / rowsPerPage)}`;
-
-    prevBtn.disabled = page === 1;
-    nextBtn.disabled = page === Math.ceil(filteredData.length / rowsPerPage);
-}
-
-prevBtn.addEventListener("click", () => {
-    if (currentPage > 1) {
-        currentPage--;
-        renderTable(currentPage, searchInput.value);
+fetch(url)
+  .then(response => response.json())
+  .then(data => {
+    const rows = data.values;
+    if (rows.length > 0) {
+      const table = document.getElementById('table'); // تأكد من أن لديك العنصر table في HTML
+      rows.forEach((row, index) => {
+        if (index > 0) { // تخطي السطر الأول إذا كان يحتوي على العناوين
+          const tr = document.createElement('tr');
+          row.forEach(cell => {
+            const td = document.createElement('td');
+            td.textContent = cell;
+            tr.appendChild(td);
+          });
+          table.appendChild(tr);
+        }
+      });
     }
-});
-
-nextBtn.addEventListener("click", () => {
-    currentPage++;
-    renderTable(currentPage, searchInput.value);
-});
-
-searchInput.addEventListener("input", (e) => {
-    currentPage = 1;
-    renderTable(currentPage, e.target.value);
-});
-
-// جلب البيانات من Google Sheets
-function fetchDataFromSheet() {
-    Tabletop.init({
-        key: "https://docs.google.com/spreadsheets/d/1yJFfUHMJCLBpd8yLWtodRCT1r9ucci2kR5O6_lgYX7I/edit?usp=sharing", // ضع رابط Google Sheets هنا
-        simpleSheet: true,
-        callback: function (data) {
-            tableData = data;
-            renderTable();
-        },
-    });
-}
-
-// استدعاء الدالة لجلب البيانات
-fetchDataFromSheet();
+  })
+  .catch(error => {
+    console.error('Error fetching data from Google Sheets:', error);
+  });
