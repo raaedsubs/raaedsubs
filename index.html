@@ -1,80 +1,38 @@
-{\rtf1\ansi\ansicpg1252\cocoartf2761
-\cocoatextscaling0\cocoaplatform0{\fonttbl\f0\fswiss\fcharset0 Helvetica;\f1\fnil\fcharset178 GeezaPro;}
-{\colortbl;\red255\green255\blue255;}
-{\*\expandedcolortbl;;}
-\paperw11900\paperh16840\margl1440\margr1440\vieww11520\viewh8400\viewkind0
-\pard\tx566\tx1133\tx1700\tx2267\tx2834\tx3401\tx3968\tx4535\tx5102\tx5669\tx6236\tx6803\pardirnatural\partightenfactor0
-
-\f0\fs24 \cf0 <!DOCTYPE html>\
-<html lang="ar" dir="rtl">\
-<head>\
-    <meta charset="UTF-8">\
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">\
-    <title>
-\f1 \'cc\'cf\'e6\'e1
-\f0  
-\f1 \'c7\'e1\'c8\'ed\'c7\'e4\'c7\'ca
-\f0 </title>\
-    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;700&display=swap" rel="stylesheet">\
-    <link rel="stylesheet" href="styles.css">\
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/tabletop.js/1.5.4/tabletop.min.js"></script>\
-</head>\
-<body>\
-    <div class="container">\
-        <div class="table-controls">\
-            <input type="text" id="search" placeholder="
-\f1 \'c8\'cd\'cb
-\f0  
-\f1 \'da\'e4
-\f0  
-\f1 \'e3\'d4\'c7\'d1\'df\'c9
-\f0 ...">\
-        </div>\
-        <table>\
-            <thead>\
-                <tr>\
-                    <th>
-\f1 \'c7\'e1\'c7\'d3\'e3
-\f0 </th>\
-                    <th>
-\f1 \'c7\'e1\'e4\'e6\'da
-\f0 </th>\
-                    <th>
-\f1 \'c7\'e1\'cd\'c7\'e1\'c9
-\f0 </th>\
-                    <th>
-\f1 \'da\'cf\'cf
-\f0  
-\f1 \'c7\'e1\'cd\'e1\'de\'c7\'ca
-\f0 </th>\
-                    <th>
-\f1 \'c7\'e1\'ca\'d1\'cc\'e3\'c9
-\f0 </th>\
-                </tr>\
-            </thead>\
-            <tbody id="table-body">\
-                <!-- 
-\f1 \'d3\'ed\'ca\'e3
-\f0  
-\f1 \'e3\'e1\'c1
-\f0  
-\f1 \'c7\'e1\'d5\'dd\'e6\'dd
-\f0  
-\f1 \'c8\'c7\'d3\'ca\'ce\'cf\'c7\'e3
-\f0  JavaScript -->\
-            </tbody>\
-        </table>\
-        <div class="pagination">\
-            <button id="prev-btn">
-\f1 \'c7\'e1\'d3\'c7\'c8\'de
-\f0 </button>\
-            <span id="page-info"></span>\
-            <button id="next-btn">
-\f1 \'c7\'e1\'ca\'c7\'e1\'ed
-\f0 </button>\
-        </div>\
-    </div>\
-    <script src="script.js"></script>\
-</body>\
-</html>\
-}
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>جدول البيانات</title>
+    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/tabletop.js/1.5.4/tabletop.min.js"></script>
+</head>
+<body>
+    <div class="container">
+        <div class="table-controls">
+            <input type="text" id="search" placeholder="بحث عن مشاركة...">
+        </div>
+        <table>
+            <thead>
+                <tr>
+                    <th>الاسم</th>
+                    <th>النوع</th>
+                    <th>الحالة</th>
+                    <th>عدد الحلقات</th>
+                    <th>الترجمة</th>
+                </tr>
+            </thead>
+            <tbody id="table-body">
+                <!-- سيتم ملء الصفوف باستخدام JavaScript -->
+            </tbody>
+        </table>
+        <div class="pagination">
+            <button id="prev-btn">السابق</button>
+            <span id="page-info"></span>
+            <button id="next-btn">التالي</button>
+        </div>
+    </div>
+    <script src="script.js"></script>
+</body>
+</html>
