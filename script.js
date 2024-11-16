@@ -1,16 +1,16 @@
 const sheetId = "1yJFfUHMJCLBpd8yLWtodRCT1r9ucci2kR5O6_lgYX7I";
-const sheetName = "Sheet1"; // اسم الورقة
-const apiKey = "AIzaSyC_DYo3WavStFbToNWxhG21DqAi7_QAm6Q"; // API Key الذي حصلت عليه
+const sheetName = "Sheet1";  // اسم الورقة (تأكد من أنه يطابق اسم الورقة في Google Sheets)
+const apiKey = "AIzaSyC_DYo3WavStFbToNWxhG21DqAi7_QAm6Q";  // API Key الخاص بك
 
-// استعلام API
 const url = `https://sheets.googleapis.com/v4/spreadsheets/${sheetId}/values/${sheetName}?key=${apiKey}`;
 
 fetch(url)
   .then(response => response.json())
   .then(data => {
-    const rows = data.values;
-    if (rows.length > 0) {
-      const table = document.getElementById('table'); // تأكد من أن لديك العنصر table في HTML
+    if (data.values && data.values.length > 0) {
+      const rows = data.values;
+      const table = document.getElementById('table'); // تأكد من وجود عنصر table في HTML
+
       rows.forEach((row, index) => {
         if (index > 0) { // تخطي السطر الأول إذا كان يحتوي على العناوين
           const tr = document.createElement('tr');
@@ -22,8 +22,10 @@ fetch(url)
           table.appendChild(tr);
         }
       });
+    } else {
+      console.log("لا توجد بيانات في الجدول.");
     }
   })
   .catch(error => {
-    console.error('Error fetching data from Google Sheets:', error);
+    console.error('خطأ في جلب البيانات من Google Sheets:', error);
   });
