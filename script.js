@@ -55,7 +55,7 @@ searchInput.addEventListener("input", (e) => {
 // جلب البيانات من Google Sheets
 function fetchDataFromSheet() {
     Tabletop.init({
-        key: "YOUR_GOOGLE_SHEET_URL", // ضع رابط Google Sheets هنا
+        key: "https://docs.google.com/spreadsheets/d/1yJFfUHMJCLBpd8yLWtodRCT1r9ucci2kR5O6_lgYX7I/edit?usp=sharing", // ضع رابط Google Sheets هنا
         simpleSheet: true,
         callback: function (data) {
             tableData = data;
