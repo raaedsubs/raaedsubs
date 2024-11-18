@@ -128,7 +128,7 @@
   </div>
 
   <script>
-    const googleSheetURL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vTyqJzmQXJQzmWBXBY9EdQP2BFZvgMaHQiXcOUTQ08kaaA00X0XGwd0PkgRl0T29PH2T3bNuwvrJDzV/pub?gid=0&single=true&output=csv'; // ضع رابط CSV هنا
+    const googleSheetURL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vTyqJzmQXJQzmWBXBY9EdQP2BFZvgMaHQiXcOUTQ08kaaA00X0XGwd0PkgRl0T29PH2T3bNuwvrJDzV/pub?gid=0&single=true&output=csv'; // رابط CSV
     const rowsPerPage = 20; // عدد الصفوف لكل صفحة
     let currentPage = 1;
     let tableData = [];
@@ -174,13 +174,7 @@
 
         // معالجة عمود الترجمة لعرض الروابط مع الأسماء
         let translationContent = row.translation;
-        const links = translationContent.split(',').map(link => {
-          const [name, url] = link.split('|').map(item => item.trim());
-          if (url && name) {
-            return `<a href="${url}" target="_blank">${name}</a>`;
-          }
-          return ''; // إذا كانت البيانات غير صحيحة، لا تعرض شيء
-        }).join('<br>'); // عرض الروابط مع الأسماء في أسطر منفصلة
+        const links = parseLinks(translationContent);
 
         tr.innerHTML = `
           <td>${row.name}</td>
@@ -193,6 +187,31 @@
       });
 
       updatePagination();
+    }
+
+    // وظيفة لتحليل الروابط المتعددة وعرضها
+    function parseLinks(translationContent) {
+      const linkRegex = /([^|]+)\|([^\s]+)/g;
+      const matches = [];
+      let match;
+      
+      // استخراج جميع الروابط التي تتبع الشكل "اسم الرابط|URL"
+      while (match = linkRegex.exec(translationContent)) {
+        const name = match[1].trim();
+        const url = match[2].trim();
+        if (isValidUrl(url)) {
+          matches.push(`<a href="${url}" target="_blank">${name}</a>`);
+        }
+      }
+
+      // إعادة الروابط المفصولة بـ <br> لعرضها بشكل منفصل في الجدول
+      return matches.join('<br>');
+    }
+
+    // التحقق من صحة الرابط باستخدام Regular Expression
+    function isValidUrl(url) {
+      const urlRegex = /^(https?:\/\/)?([a-zA-Z0-9.-]+)([\/?].*)?$/;
+      return urlRegex.test(url);
     }
 
     // تحديث الترقيم
