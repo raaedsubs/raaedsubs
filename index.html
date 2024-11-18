@@ -1,221 +1,315 @@
 <!DOCTYPE html>
-<html lang="ar" dir="rtl">
+<html lang="ar">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>جدول ديناميكي مع Google Sheets</title>
-  <style>
-    body {
-      font-family: 'Tajawal', sans-serif;
-      margin: 0;
-      padding: 0;
-      background-color: #f9f9f9;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      min-height: 100vh;
-    }
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>موقع المحتوى مع التسجيل</title>
+    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <style>
+        /* CSS Reset */
+        *, *::before, *::after {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
 
-    h1 {
-      margin-bottom: 20px;
-      color: #444;
-    }
+        body, h1, h2, h3, p, a, table, th, td {
+            font-family: 'Tajawal', sans-serif;
+        }
 
-    .search-container {
-      margin-bottom: 20px;
-      display: flex;
-      justify-content: center;
-    }
+        body {
+            background-color: #f4f4f4;
+            color: #333;
+            line-height: 1.6;
+            font-size: 16px;
+            padding: 20px;
+            direction: rtl;  /* دعم الكتابة من اليمين لليسار */
+        }
 
-    .search-container input {
-      padding: 10px;
-      width: 100%;
-      max-width: 400px;
-      border: 2px solid #ddd;
-      border-radius: 5px;
-      font-size: 16px;
-    }
+        .container {
+            width: 100%;
+            max-width: 1200px;
+            margin: 0 auto;
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
 
-    table {
-      border-collapse: collapse;
-      width: 100%;
-      max-width: 1200px;
-      margin: 20px auto;
-      background-color: #fff;
-      border-radius: 10px;
-      overflow: hidden;
-      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-    }
+        header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
 
-    thead {
-      background-color: #4CAF50;
-      color: #fff;
-    }
+        h1 {
+            font-size: 2.5rem;
+            margin-bottom: 20px;
+        }
 
-    th, td {
-      padding: 15px;
-      text-align: center;
-      border: 1px solid #ddd;
-    }
+        .login-screen, .content-screen {
+            display: none;
+        }
 
-    th {
-      font-size: 18px;
-    }
+        .login-screen.active, .content-screen.active {
+            display: block;
+        }
 
-    tbody tr:nth-child(odd) {
-      background-color: #f2f2f2;
-    }
+        input[type="text"], input[type="password"], input[type="email"], input[type="submit"] {
+            width: 100%;
+            padding: 10px;
+            margin: 10px 0;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
 
-    tbody tr:hover {
-      background-color: #f1f1f1;
-    }
+        button {
+            padding: 10px 20px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
 
-    a {
-      color: #007BFF;
-      text-decoration: none;
-    }
+        button:hover {
+            background-color: #0056b3;
+        }
 
-    a:hover {
-      text-decoration: underline;
-    }
+        .error-message {
+            color: red;
+            font-size: 0.9rem;
+            margin-top: 10px;
+        }
 
-    .pagination {
-      margin-top: 20px;
-      display: flex;
-      justify-content: center;
-      gap: 5px;
-    }
+        table {
+            width: 100%;
+            margin-top: 30px;
+            border-collapse: collapse;
+        }
 
-    .pagination button {
-      padding: 10px 15px;
-      border: none;
-      border-radius: 5px;
-      background-color: #4CAF50;
-      color: #fff;
-      font-size: 16px;
-      cursor: pointer;
-    }
+        th, td {
+            padding: 10px;
+            text-align: right;
+            border: 1px solid #ddd;
+        }
 
-    @media screen and (max-width: 768px) {
-      table {
-        width: 90%;
-      }
+        th {
+            background-color: #f2f2f2;
+        }
 
-      .search-container input {
-        width: 100%;
-      }
-    }
+        .pagination button {
+            padding: 8px 12px;
+            margin: 5px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
 
-  </style>
+        .pagination button.active {
+            background-color: #0056b3;
+        }
+    </style>
 </head>
 <body>
+    <div class="container">
+        <header>
+            <h1>موقع المحتوى مع التسجيل</h1>
+        </header>
 
-  <h1>جدول ديناميكي مع Google Sheets</h1>
+        <!-- شاشة تسجيل الدخول -->
+        <div id="login-screen" class="login-screen active">
+            <h2>تسجيل الدخول</h2>
+            <form id="login-form">
+                <input type="email" id="login-email" placeholder="البريد الإلكتروني" required>
+                <input type="password" id="login-password" placeholder="كلمة المرور" required>
+                <button type="submit">تسجيل الدخول</button>
+                <p class="error-message" id="login-error"></p>
+            </form>
+            <button onclick="showSignupScreen()">إنشاء حساب جديد</button>
+        </div>
 
-  <div class="search-container">
-    <input type="text" id="search" placeholder="ابحث هنا...">
-  </div>
+        <!-- شاشة التسجيل -->
+        <div id="signup-screen" class="login-screen">
+            <h2>إنشاء حساب</h2>
+            <form id="signup-form">
+                <input type="email" id="signup-email" placeholder="البريد الإلكتروني" required>
+                <input type="text" id="signup-username" placeholder="اسم المستخدم" required>
+                <input type="password" id="signup-password" placeholder="كلمة المرور" required>
+                <button type="submit">إنشاء حساب</button>
+                <p class="error-message" id="signup-error"></p>
+            </form>
+            <button onclick="showLoginScreen()">لديك حساب؟ تسجيل الدخول</button>
+        </div>
 
-  <table id="data-table">
-    <thead>
-      <tr>
-        <th>الاسم</th>
-        <th>النوع</th>
-        <th>الحالة</th>
-        <th>عدد الحلقات</th>
-        <th>الترجمة</th>
-      </tr>
-    </thead>
-    <tbody>
-      <!-- سيتم ملؤها من البيانات -->
-    </tbody>
-  </table>
+        <!-- شاشة المحتوى -->
+        <div id="content-screen" class="content-screen">
+            <h2>المحتوى</h2>
+            <table id="content-table">
+                <thead>
+                    <tr>
+                        <th>الاسم</th>
+                        <th>النوع</th>
+                        <th>عدد الحلقات</th>
+                        <th>الحالة</th>
+                        <th>رابط الترجمة</th>
+                    </tr>
+                </thead>
+                <tbody></tbody>
+            </table>
 
-  <div class="pagination" id="pagination"></div>
+            <div id="pagination" class="pagination"></div>
+        </div>
+    </div>
 
-  <script>
-    const sheetUrl = 'https://spreadsheets.google.com/feeds/list/1hqsqI9uWbarf8valN1vxo9yydiN6nRo6zsIsR858zn8/od6/public/values?alt=json'; // رابط Google Sheets الخاص بك
-    const rowsPerPage = 20;
-    let currentPage = 1;
-    let tableData = [];
-    let filteredData = [];
+    <script>
+        const loginForm = document.getElementById('login-form');
+        const signupForm = document.getElementById('signup-form');
+        const loginEmail = document.getElementById('login-email');
+        const loginPassword = document.getElementById('login-password');
+        const signupEmail = document.getElementById('signup-email');
+        const signupUsername = document.getElementById('signup-username');
+        const signupPassword = document.getElementById('signup-password');
+        const loginError = document.getElementById('login-error');
+        const signupError = document.getElementById('signup-error');
+        const contentScreen = document.getElementById('content-screen');
+        const loginScreen = document.getElementById('login-screen');
+        const signupScreen = document.getElementById('signup-screen');
+        const contentTable = document.getElementById('content-table').getElementsByTagName('tbody')[0];
+        const pagination = document.getElementById('pagination');
 
-    async function fetchSheetData() {
-      try {
-        const response = await fetch(sheetUrl);
-        const data = await response.json();
-        parseData(data);
-        filteredData = [...tableData];
-        displayTable();
-      } catch (error) {
-        console.error('خطأ أثناء جلب البيانات:', error);
-      }
-    }
+        let currentPage = 1;
+        const itemsPerPage = 20;
 
-    function parseData(data) {
-      const entries = data.feed.entry;
-      tableData = entries.map(entry => ({
-        name: entry.gsx$name.$t,
-        type: entry.gsx$type.$t,
-        status: entry.gsx$status.$t,
-        episodes: entry.gsx$episodes.$t,
-        translation: entry.gsx$translation.$t
-      }));
-    }
+        // الدالة لإظهار شاشة التسجيل
+        function showSignupScreen() {
+            signupScreen.classList.add('active');
+            loginScreen.classList.remove('active');
+        }
 
-    function displayTable(page = 1) {
-      const tbody = document.getElementById('data-table').querySelector('tbody');
-      tbody.innerHTML = '';
-      const start = (page - 1) * rowsPerPage;
-      const end = start + rowsPerPage;
-      const dataToDisplay = filteredData.slice(start, end);
+        // الدالة لإظهار شاشة الدخول
+        function showLoginScreen() {
+            loginScreen.classList.add('active');
+            signupScreen.classList.remove('active');
+        }
 
-      dataToDisplay.forEach(row => {
-        const tr = document.createElement('tr');
-        let translationLinks = row.translation.split('|').map(link => {
-          return `<a href="${link.trim()}" target="_blank">${link.trim()}</a>`;
-        }).join('<br>');
-        
-        tr.innerHTML = `
-          <td>${row.name}</td>
-          <td>${row.type}</td>
-          <td>${row.status}</td>
-          <td>${row.episodes}</td>
-          <td>${translationLinks}</td>
-        `;
-        tbody.appendChild(tr);
-      });
+        // الدالة لإظهار شاشة المحتوى
+        function showContentScreen() {
+            contentScreen.classList.add('active');
+            loginScreen.classList.remove('active');
+            signupScreen.classList.remove('active');
+        }
 
-      updatePagination();
-    }
+        // تسجيل الدخول
+        loginForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            const email = loginEmail.value;
+            const password = loginPassword.value;
 
-    function updatePagination() {
-      const pagination = document.getElementById('pagination');
-      pagination.innerHTML = '';
-      const totalPages = Math.ceil(filteredData.length / rowsPerPage);
-      for (let i = 1; i <= totalPages; i++) {
-        const button = document.createElement('button');
-        button.textContent = i;
-        button.disabled = i === currentPage;
-        button.addEventListener('click', () => {
-          currentPage = i;
-          displayTable(i);
+            fetch('https://sheetdb.io/api/v1/clr7339juzcwd')
+                .then(response => response.json())
+                .then(data => {
+                    const user = data.find(user => user.email === email && user.password === password);
+                    if (user) {
+                        localStorage.setItem('user', JSON.stringify(user));
+                        showContentScreen();
+                    } else {
+                        loginError.textContent = 'البريد الإلكتروني أو كلمة المرور غير صحيحة';
+                    }
+                })
+                .catch(error => console.error('Error:', error));
         });
-        pagination.appendChild(button);
-      }
-    }
 
-    document.getElementById('search').addEventListener('input', function() {
-      const searchText = this.value.toLowerCase();
-      filteredData = tableData.filter(row =>
-        Object.values(row).some(value => value.toLowerCase().includes(searchText))
-      );
-      currentPage = 1;
-      displayTable();
-    });
+        // إنشاء حساب
+        signupForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            const email = signupEmail.value;
+            const username = signupUsername.value;
+            const password = signupPassword.value;
 
-    fetchSheetData();
-  </script>
+            if (!/\S+@\S+\.\S+/.test(email)) {
+                signupError.textContent = 'البريد الإلكتروني غير صالح';
+                return;
+            }
+
+            fetch('https://sheetdb.io/api/v1/clr7339juzcwd', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    data: [
+                        {
+                            email: email,
+                            username: username,
+                            password: password
+                        }
+                    ]
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                alert('تم إنشاء الحساب بنجاح!');
+                showLoginScreen();
+            })
+            .catch(error => console.error('Error:', error));
+        });
+
+        // جلب المحتوى من API
+        function fetchData() {
+            fetch('https://sheetdb.io/api/v1/jk0nwvej372zt')
+                .then(response => response.json())
+                .then(data => {
+                    renderContent(data);
+                    renderPagination(data.length);
+                })
+                .catch(error => console.error('Error:', error));
+        }
+
+        // عرض المحتوى في الجدول
+        function renderContent(data) {
+            const start = (currentPage - 1) * itemsPerPage;
+            const end = start + itemsPerPage;
+            const currentPageData = data.slice(start, end);
+            contentTable.innerHTML = '';
+            currentPageData.forEach(item => {
+                const row = contentTable.insertRow();
+                row.innerHTML = `
+                    <td>${item.name}</td>
+                    <td>${item.type}</td>
+                    <td>${item.episodes}</td>
+                    <td>${item.status}</td>
+                    <td><a href="${item.translationLink}">رابط الترجمة</a></td>
+                `;
+            });
+        }
+
+        // عرض الترقيم
+        function renderPagination(totalItems) {
+            const totalPages = Math.ceil(totalItems / itemsPerPage);
+            pagination.innerHTML = '';
+
+            for (let i = 1; i <= totalPages; i++) {
+                const button = document.createElement('button');
+                button.textContent = i;
+                button.classList.toggle('active', i === currentPage);
+                button.addEventListener('click', () => {
+                    currentPage = i;
+                    fetchData();
+                });
+                pagination.appendChild(button);
+            }
+        }
+
+        // بدء جلب البيانات عند فتح الموقع
+        if (localStorage.getItem('user')) {
+            showContentScreen();
+            fetchData();
+        } else {
+            showLoginScreen();
+        }
+    </script>
 </body>
 </html>
