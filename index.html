@@ -1,38 +1,219 @@
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>جدول البيانات</title>
-    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="styles.css">
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/tabletop.js/1.5.4/tabletop.min.js"></script>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>جدول ديناميكي متصل بـ Google Sheets</title>
+  <style>
+    body {
+      font-family: 'Tajawal', sans-serif;
+      margin: 0;
+      padding: 0;
+      background-color: #f9f9f9;
+      color: #333;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+    }
+
+    h1 {
+      margin-bottom: 20px;
+      color: #444;
+    }
+
+    .search-container {
+      margin-bottom: 20px;
+      display: flex;
+      justify-content: center;
+    }
+
+    .search-container input {
+      padding: 10px;
+      width: 300px;
+      border: 2px solid #ddd;
+      border-radius: 5px;
+      font-size: 16px;
+    }
+
+    table {
+      border-collapse: collapse;
+      width: 80%;
+      margin: 0 auto;
+      background-color: #fff;
+      border-radius: 10px;
+      overflow: hidden;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    }
+
+    thead {
+      background-color: #4CAF50;
+      color: #fff;
+    }
+
+    th, td {
+      padding: 15px;
+      text-align: center;
+      border: 1px solid #ddd;
+    }
+
+    th {
+      font-size: 18px;
+    }
+
+    tbody tr:nth-child(odd) {
+      background-color: #f2f2f2;
+    }
+
+    tbody tr:hover {
+      background-color: #f1f1f1;
+    }
+
+    .pagination {
+      margin-top: 20px;
+      display: flex;
+      justify-content: center;
+      gap: 5px;
+    }
+
+    .pagination button {
+      padding: 10px 15px;
+      border: none;
+      border-radius: 5px;
+      background-color: #4CAF50;
+      color: #fff;
+      font-size: 16px;
+      cursor: pointer;
+      transition: background-color 0.3s;
+    }
+
+    .pagination button:hover {
+      background-color: #45a049;
+    }
+
+    .pagination button:disabled {
+      background-color: #ccc;
+      cursor: not-allowed;
+    }
+  </style>
 </head>
 <body>
-    <div class="container">
-        <div class="table-controls">
-            <input type="text" id="search" placeholder="بحث عن مشاركة...">
-        </div>
-        <table>
-            <thead>
-                <tr>
-                    <th>الاسم</th>
-                    <th>النوع</th>
-                    <th>الحالة</th>
-                    <th>عدد الحلقات</th>
-                    <th>الترجمة</th>
-                </tr>
-            </thead>
-            <tbody id="table-body">
-                <!-- سيتم ملء الصفوف باستخدام JavaScript -->
-            </tbody>
-        </table>
-        <div class="pagination">
-            <button id="prev-btn">السابق</button>
-            <span id="page-info"></span>
-            <button id="next-btn">التالي</button>
-        </div>
-    </div>
-    <script src="script.js"></script>
+  <h1>جدول ديناميكي متصل بـ Google Sheets</h1>
+
+  <!-- خانة البحث -->
+  <div class="search-container">
+    <input type="text" id="search" placeholder="ابحث هنا...">
+  </div>
+
+  <!-- الجدول -->
+  <table id="data-table">
+    <thead>
+      <tr>
+        <th>الاسم</th>
+        <th>النوع</th>
+        <th>الحالة</th>
+        <th>عدد الحلقات</th>
+        <th>الترجمة</th>
+      </tr>
+    </thead>
+    <tbody>
+      <!-- الصفوف الديناميكية ستضاف هنا -->
+    </tbody>
+  </table>
+
+  <!-- الترقيم -->
+  <div class="pagination" id="pagination">
+    <!-- أزرار الترقيم ستضاف هنا -->
+  </div>
+
+  <script>
+    const googleSheetURL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vTyqJzmQXJQzmWBXBY9EdQP2BFZvgMaHQiXcOUTQ08kaaA00X0XGwd0PkgRl0T29PH2T3bNuwvrJDzV/pub?gid=0&single=true&output=csv';
+    const rowsPerPage = 5;
+    let currentPage = 1;
+    let tableData = [];
+
+    // جلب البيانات من Google Sheets
+    async function fetchGoogleSheetData() {
+      try {
+        const response = await fetch(googleSheetURL);
+        const csvText = await response.text();
+        parseCSV(csvText);
+        displayTable();
+      } catch (error) {
+        console.error("خطأ أثناء جلب البيانات:", error);
+      }
+    }
+
+    // تحويل بيانات CSV إلى مصفوفة
+    function parseCSV(csv) {
+      const rows = csv.split('\n').map(row => row.split(','));
+      const [header, ...data] = rows;
+      tableData = data.map(row => ({
+        name: row[0],
+        type: row[1],
+        status: row[2],
+        episodes: row[3],
+        translation: row[4],
+      }));
+    }
+
+    // عرض البيانات في الجدول
+    function displayTable(page = 1) {
+      const tbody = document.getElementById('data-table').querySelector('tbody');
+      tbody.innerHTML = "";
+
+      const start = (page - 1) * rowsPerPage;
+      const end = start + rowsPerPage;
+      const paginatedData = tableData.slice(start, end);
+
+      paginatedData.forEach(row => {
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+          <td>${row.name}</td>
+          <td>${row.type}</td>
+          <td>${row.status}</td>
+          <td>${row.episodes}</td>
+          <td><a href="#">${row.translation}</a></td>
+        `;
+        tbody.appendChild(tr);
+      });
+
+      updatePagination();
+    }
+
+    // تحديث الترقيم
+    function updatePagination() {
+      const pagination = document.getElementById('pagination');
+      pagination.innerHTML = "";
+
+      const totalPages = Math.ceil(tableData.length / rowsPerPage);
+      for (let i = 1; i <= totalPages; i++) {
+        const button = document.createElement('button');
+        button.textContent = i;
+        button.disabled = i === currentPage;
+        button.addEventListener('click', () => {
+          currentPage = i;
+          displayTable(i);
+        });
+        pagination.appendChild(button);
+      }
+    }
+
+    // البحث
+    document.getElementById('search').addEventListener('input', function () {
+      const searchText = this.value.toLowerCase();
+      const filteredData = tableData.filter(row => 
+        Object.values(row).some(value => value.toLowerCase().includes(searchText))
+      );
+
+      currentPage = 1;
+      tableData = filteredData;
+      displayTable();
+    });
+
+    // جلب البيانات عند التحميل
+    fetchGoogleSheetData();
+  </script>
 </body>
 </html>
