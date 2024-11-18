@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>جدول ديناميكي متصل بـ Google Sheets</title>
   <style>
+    /* الأساسيات */
     body {
       font-family: 'Tajawal', sans-serif;
       margin: 0;
@@ -23,6 +24,7 @@
       color: #444;
     }
 
+    /* تنسيق خانة البحث */
     .search-container {
       margin-bottom: 20px;
       display: flex;
@@ -31,16 +33,19 @@
 
     .search-container input {
       padding: 10px;
-      width: 300px;
+      width: 100%;
+      max-width: 400px;
       border: 2px solid #ddd;
       border-radius: 5px;
       font-size: 16px;
     }
 
+    /* تنسيق الجدول */
     table {
       border-collapse: collapse;
-      width: 80%;
-      margin: 0 auto;
+      width: 100%;
+      max-width: 1200px;
+      margin: 20px auto;
       background-color: #fff;
       border-radius: 10px;
       overflow: hidden;
@@ -56,6 +61,7 @@
       padding: 15px;
       text-align: center;
       border: 1px solid #ddd;
+      word-wrap: break-word;
     }
 
     th {
@@ -70,6 +76,18 @@
       background-color: #f1f1f1;
     }
 
+    /* الروابط داخل الخلايا */
+    a {
+      color: #007BFF;
+      text-decoration: none;
+      word-break: break-word;
+    }
+
+    a:hover {
+      text-decoration: underline;
+    }
+
+    /* الترقيم */
     .pagination {
       margin-top: 20px;
       display: flex;
@@ -96,6 +114,18 @@
       background-color: #ccc;
       cursor: not-allowed;
     }
+
+    /* لجعل الموقع متجاوبًا */
+    @media screen and (max-width: 768px) {
+      table {
+        width: 90%;
+      }
+
+      .search-container input {
+        width: 100%;
+      }
+    }
+
   </style>
 </head>
 <body>
