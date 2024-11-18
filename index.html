@@ -172,14 +172,15 @@
       paginatedData.forEach(row => {
         const tr = document.createElement('tr');
 
-        // معالجة عمود الترجمة لتحديد النصوص والروابط المتعددة
+        // معالجة عمود الترجمة لعرض الروابط المتعددة
         let translationContent = row.translation;
-        if (row.translation.includes('|')) {
-          const links = row.translation.split(','); // تقسيم الروابط المتعددة
+        try {
+          const links = JSON.parse(row.translation); // تحويل النص إلى JSON
           translationContent = links.map(link => {
-            const [text, url] = link.split('|'); // تقسيم النص والرابط
-            return `<a href="${url}" target="_blank">${text}</a>`;
+            return `<a href="${link.url}" target="_blank">${link.text}</a>`;
           }).join('<br>'); // عرض الروابط في أسطر منفصلة
+        } catch (e) {
+          console.warn("تنسيق غير صالح في الترجمة:", row.translation);
         }
 
         tr.innerHTML = `
