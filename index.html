@@ -128,10 +128,11 @@
   </div>
 
   <script>
-    const googleSheetURL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vTyqJzmQXJQzmWBXBY9EdQP2BFZvgMaHQiXcOUTQ08kaaA00X0XGwd0PkgRl0T29PH2T3bNuwvrJDzV/pub?output=csv';
+    const googleSheetURL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vTyqJzmQXJQzmWBXBY9EdQP2BFZvgMaHQiXcOUTQ08kaaA00X0XGwd0PkgRl0T29PH2T3bNuwvrJDzV/pubhtml'; // ضع رابط CSV هنا
     const rowsPerPage = 20; // عدد الصفوف لكل صفحة
     let currentPage = 1;
     let tableData = [];
+    let filteredData = [];
 
     // جلب البيانات من Google Sheets
     async function fetchGoogleSheetData() {
@@ -139,6 +140,7 @@
         const response = await fetch(googleSheetURL);
         const csvText = await response.text();
         parseCSV(csvText);
+        filteredData = [...tableData]; // نسخة للبحث
         displayTable();
       } catch (error) {
         console.error("خطأ أثناء جلب البيانات:", error);
@@ -165,7 +167,7 @@
 
       const start = (page - 1) * rowsPerPage;
       const end = start + rowsPerPage;
-      const paginatedData = tableData.slice(start, end);
+      const paginatedData = filteredData.slice(start, end);
 
       paginatedData.forEach(row => {
         const tr = document.createElement('tr');
@@ -187,7 +189,7 @@
       const pagination = document.getElementById('pagination');
       pagination.innerHTML = "";
 
-      const totalPages = Math.ceil(tableData.length / rowsPerPage);
+      const totalPages = Math.ceil(filteredData.length / rowsPerPage);
       for (let i = 1; i <= totalPages; i++) {
         const button = document.createElement('button');
         button.textContent = i;
@@ -203,12 +205,11 @@
     // البحث
     document.getElementById('search').addEventListener('input', function () {
       const searchText = this.value.toLowerCase();
-      const filteredData = tableData.filter(row => 
+      filteredData = tableData.filter(row =>
         Object.values(row).some(value => value.toLowerCase().includes(searchText))
       );
 
-      currentPage = 1;
-      tableData = filteredData;
+      currentPage = 1; // العودة للصفحة الأولى عند البحث
       displayTable();
     });
 
