@@ -191,21 +191,12 @@
 
     // وظيفة لتحليل الروابط المتعددة وعرضها
     function parseLinks(translationContent) {
-      const linkRegex = /([^|]+)\|([^\s]+)/g;
-      const matches = [];
-      let match;
-      
-      // استخراج جميع الروابط التي تتبع الشكل "اسم الرابط|URL"
-      while (match = linkRegex.exec(translationContent)) {
-        const name = match[1].trim();
-        const url = match[2].trim();
-        if (isValidUrl(url)) {
-          matches.push(`<a href="${url}" target="_blank">${name}</a>`);
-        }
-      }
-
-      // إعادة الروابط المفصولة بـ <br> لعرضها بشكل منفصل في الجدول
-      return matches.join('<br>');
+      const linkSeparator = '|';  // الفاصل بين الروابط داخل الخلية، تأكد أنه مطابق لما تستخدمه في CSV
+      const links = translationContent.split(linkSeparator).map(link => {
+        link = link.trim(); // إزالة المسافات الزائدة
+        return isValidUrl(link) ? `<a href="${link}" target="_blank">${link}</a>` : link;
+      });
+      return links.join('<br>');  // عرض كل رابط في سطر جديد
     }
 
     // التحقق من صحة الرابط باستخدام Regular Expression
