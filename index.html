@@ -172,23 +172,19 @@
       paginatedData.forEach(row => {
         const tr = document.createElement('tr');
 
-        // معالجة عمود الترجمة لعرض الروابط المتعددة
+        // معالجة عمود الترجمة لعرض الروابط مع الأسماء
         let translationContent = row.translation;
-        try {
-          const links = JSON.parse(row.translation); // تحويل النص إلى JSON
-          translationContent = links.map(link => {
-            return `<a href="${link.url}" target="_blank">${link.text}</a>`;
-          }).join('<br>'); // عرض الروابط في أسطر منفصلة
-        } catch (e) {
-          console.warn("تنسيق غير صالح في الترجمة:", row.translation);
-        }
+        const links = translationContent.split(',').map(link => {
+          const [name, url] = link.split('|').map(item => item.trim());
+          return `<a href="${url}" target="_blank">${name}</a>`;
+        }).join('<br>'); // عرض الروابط مع الأسماء في أسطر منفصلة
 
         tr.innerHTML = `
           <td>${row.name}</td>
           <td>${row.type}</td>
           <td>${row.status}</td>
           <td>${row.episodes}</td>
-          <td>${translationContent}</td>
+          <td>${links}</td>
         `;
         tbody.appendChild(tr);
       });
