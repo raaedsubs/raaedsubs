@@ -1,5 +1,5 @@
 // بيانات Zoho Sheet
-const zohoApiKey = "Bearer 89av70ceb1c18c9a54782a44ed91e475f4bdb"; // توكن Zoho الخاص بك
+const zohoApiKey = "https://sheet.zoho.com/api/v2/89av70ceb1c18c9a54782a44ed91e475f4bdb"; // توكن Zoho الخاص بك
 const zohoSheetId = "a8fea67ffe6c76bf52fae79b8e8dc0554c0252d1035f7ad265799f89538a7bbc"; // معرف الورقة
 const rowsPerPage = 20; // عدد الصفوف في كل صفحة
 let currentPage = 1;
