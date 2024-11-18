@@ -171,12 +171,20 @@
 
       paginatedData.forEach(row => {
         const tr = document.createElement('tr');
+
+        // معالجة عمود الترجمة لتحديد النص والرابط
+        let translationContent = row.translation;
+        if (row.translation.includes('|')) {
+          const [text, url] = row.translation.split('|'); // تقسيم النص والرابط
+          translationContent = `<a href="${url}" target="_blank">${text}</a>`;
+        }
+
         tr.innerHTML = `
           <td>${row.name}</td>
           <td>${row.type}</td>
           <td>${row.status}</td>
           <td>${row.episodes}</td>
-          <td><a href="#">${row.translation}</a></td>
+          <td>${translationContent}</td>
         `;
         tbody.appendChild(tr);
       });
